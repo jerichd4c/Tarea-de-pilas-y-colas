@@ -1,0 +1,205 @@
+Tarea de E.D.D
+instrucciones: 
+
+1. Crear un programa que invierta el orden de una pila guardando los datos con el orden invertido dentro de la misma pila.
+2. Realizar un programa que procese los datos (Hacer algo con ellos, imprimir, jugar, etc.) de una cola normal siguiendo un orden de prioridad (No utilizar colas de prioridad). Ejemplo:
+COLA:
+
+inicio - > (B, "Daniel") - (C, "Pablo") - (D, "Coraline") - (A, " Alfonzo" ) - (C, "Lara") - (A, "Paula") - (A, "Chancho") - (A, "Luz") <- fin
+
+Procesar primero las A, después B, entonces C y D
+
+3. Crear un template para una cola de prioridad utilizando listas enlazadas simples, envés de arreglos como en la practica.
+
+algunas especificaciones:
+1. el numero de prioridades puede crecer, es decir, no es estatico.
+2. cuando se refiere a (no utilizar la cola de prioridad) se refiere de que no se puede usar una clase de Queues, que generalmente es lo que se hace para hacer prioridades en C++.
+3. no se pueden usar vectores.
+
+posibles soluciones: 
+
+1. como no se tiene una clase para Queues, una solución alternativa seria crear una pila temporal, hacer las modificaciones necesarios procesando los datos, y después hacer que esa pila temporal sea la original, sin embargo, la pila siempre tiene que ser la misma, es decir, se puede crear la tempora y hacer modificaciones desde esa, pero la pila original siempre tiene que estar.
+(tomando en cuenta lo anterior, se podría decir que es una lista enlanzada debido a no tener la clase de Queues).
+
+TAMBIEN SE TIENE UN CODIGO DE EJEMPLO DE UNA CLASE DE LA UNIVERSIDAD CON CODIGO UTIL, ese es el siguiente:
+
+priorityQueue:
+
+priorityQueue.cpp
+
+#include "./priorityQueue.h"
+
+template<class T>
+priorityQueue<T>::priorityQueue(int n){
+    if(n>0){
+        this->levels=n;
+        this->array= new Queue<T>[n];
+        return;
+    }
+    this->levels=0;
+    this->array=new Queue<T>;
+
+}
+template<class T>
+void priorityQueue<T>::push(T data,int level){
+    if(levels==0){
+        array->push(data);
+    }else{
+        array[level].push(data);
+    }
+}
+template<class T>
+T priorityQueue<T>::pop(int level){
+    T data;
+     if(levels==0){
+        data=array->pop(data);
+    }else{
+        data=array[level].pop(data);
+    }
+    return data;
+}
+template<class T>
+void priorityQueue<T>:: print(int level){
+    if(levels==0){
+        array->print();
+    }else{
+        array[level].print();
+    }
+}
+
+priorityQueue.h
+
+#include "../queue/queue.cpp"
+template<class T>
+class priorityQueue
+{
+private:
+    int levels=0;
+    Queue<T>* array=NULL;
+public:
+    void push(T,int);
+    T pop(int);
+    void print(int);
+    priorityQueue(int);
+
+};
+
+queue:
+
+queue.cpp
+
+#include<iostream>
+#include "./Queue.h"
+template<class T>
+bool Queue<T>::isEmpty(){
+    return this->head==NULL;
+}
+template<class T>
+void Queue<T>::push(T data){
+       
+        Node <T> *node = new Node<T>(data,NULL);
+         if(isEmpty()){
+            head=node;
+            tail=node;
+            this->length++;
+            return;
+        }
+        tail->setNextNode(node);
+        tail=node;
+        this->length++;
+   
+}
+
+template<class T>
+T Queue<T>::pop(){
+         T data;
+         if(isEmpty()) return data;
+        Node <T> *node = head;
+        head=head->getNextNode();
+        data = node->getData();
+        delete node;
+        this->length--;
+        return data;
+}
+template<class T>
+void Queue<T>::print(){
+
+      while(!isEmpty()) {
+
+       std::cout<<pop()<<endl;
+      }
+}
+template<class T>
+int Queue<T>::getLength(){
+    return this->length;
+}
+
+queue.h
+
+#include "../queueNode/node.cpp"
+template<class T>
+class Queue{
+    private:
+        Node<T> *head=NULL;
+        Node<T> *tail=NULL;
+        int length=0;
+    public:
+        int getLength();
+        void push(T);
+        T pop();
+        bool isEmpty();
+        void print();
+};
+
+node:
+
+node.cpp
+
+
+template <class T>
+void Node<T>::setNextNode(Node<T>* next){
+     if(next!=NULL){
+        this->next=next;
+    }
+}
+
+template <class T>
+void Node<T>::setData(T data){
+    this->data=data;
+}
+
+
+template <class T>
+T Node<T>::getData(){
+   return this->data;
+}
+
+
+
+template<class T>
+void Node<T>::print(){
+    cout<<this->data<<endl; //solo para datos simples
+}
+template <class T>
+Node<T>::~Node(){
+    next=NULL;
+}
+
+node.h
+
+template<class T>
+class Node{
+    private:
+        T data;
+        Node<T> *next=NULL;
+    public:
+        Node(T,Node<T>*);
+        ~Node();
+        Node<T>* getNextNode();
+        void setData(T);
+        T getData();
+        void setNextNode(Node<T>*);
+        void print();
+};
+
+Como se puede observar, el código esta separado en estructura MVC (modelo, vista, controlador) sin embargo, para esta tarea no es necesario, lo que si es necesario que se usen templates.
