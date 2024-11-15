@@ -6,13 +6,13 @@ using namespace std;
 template <class T>
 class Node {
     public:
-    T data;
     char priority;
+    T data;
     Node<T>* next;
-    Node(T data, char priority) : data(data), priority(priority), next(nullptr) {}
+    Node(char priority, T data) : priority(priority), data(data), next(nullptr) {}
 };
 
-// class Queue
+// class Queue para first in first out
 template <class T>
 class Queue {
     private:
@@ -22,7 +22,7 @@ class Queue {
     Queue() : head(nullptr), tail(nullptr) {}
 
     void push (T data, char priority) {
-        Node <T>* newNode = new Node<T>(data, priority);
+        Node <T>* newNode = new Node<T>(priority,data);
         if (tail) { 
             tail->next = newNode;
         } else {
@@ -30,57 +30,70 @@ class Queue {
         }
         tail = newNode;
     }
-
-    //funcion para procesar por prioridad
-
-    void processByPriority (char priority) {
-        Node <T>* current = head;
-        Node <T>* prev = NULL;
-        cout << "Procesando prioridad " << priority << ":" << endl;
-
-        while (current!=NULL) {
-            if (current->priority == priority) {
-                cout << current->data <<" ";
-                //remover nodo
-                if (prev) {
-                    prev->next = current->next;
+    // Procesar los elementos en orden de prioridad sin alterar el orden original de la cola
+    void processByPriority(const string& priorityOrder) {
+        for (char priority : priorityOrder) {
+            int count = 0;
+            int size =this->getSize();
+            cout<<"procesando prioridad "<<priority<<":"<<endl;
+            for (int i = 0; i < size; i++) {
+                Node<T>* current = this->pop();
+                if (current->priority == priority) {
+                    cout<<current->data<<endl;
+                    delete current; //procesar y eliminar
                 } else {
-                    head = current->next;
+                    //re-queue el elemento
+                    this->push(current->data, current->priority);
+                    delete current; //se eelimina nodo tempora
                 }
-                Node <T>* temp = current;
-                current = current->next;
-                
-                if (temp == tail) tail = prev; //en caso de que se tenga que actualizar la cola
-                delete temp;
-        } else {
-            prev = current;
-            current = current->next;
+            }
+            cout<<endl;
         }
     }
-    cout<<endl;
+
+    //funcion para (FIFO)
+
+    Node<T>* pop() {
+        if (head==nullptr) {
+            throw runtime_error("La cola esta vacia");
     }
-    bool isEmpty() {
-        return head==NULL;
+    Node <T>* temp = head;
+    head = head->next;
+    if (!head) {
+        tail=nullptr; // si la lista queda vacia se actualiza tail
+    }
+    return temp;
+    }
+    //funcion para saber el tamaño de la cola
+    int getSize() {
+        int size = 0;
+        Node<T>* temp = head;
+        while (temp) {
+            size++;
+            temp = temp->next;
+        }
+        return size;
+    }
+    //funcion isEmpty para verificar cola vacia
+    bool isEmpty() const {
+        return head == nullptr;
     }
 };
 
-
 int main () {
-    Queue<string> pila;
+    Queue<string> cola;
 
-    pila.push("Daniel", 'B');
-    pila.push("Pablo", 'C');
-    pila.push("Coraline", 'D');
-    pila.push("Alfonzo", 'A');
-    pila.push("Lara", 'C');
-    pila.push("Paula", 'A');
-    pila.push("Chancho", 'A');
-    pila.push("Luz", 'A');
-    pila.push("Daniel", 'E');
+    cola.push("Daniel", 'B');
+    cola.push("Pablo", 'C');
+    cola.push("Coraline", 'D');
+    cola.push("Alfonzo", 'A');
+    cola.push("Lara", 'C');
+    cola.push("Paula", 'A');
+    cola.push("Chancho", 'A');
+    cola.push("Luz", 'A');
+    cola.push("Daniel", 'E');
     //procesarlos
-    char prioridades[] = {'A', 'B', 'C', 'D','E'};
-    for (char priority : prioridades) {
-        pila.processByPriority(priority);
-    }
+    string prioridades = "ABCDE";
+    cola.processByPriority(prioridades);
     return 0;
 }
