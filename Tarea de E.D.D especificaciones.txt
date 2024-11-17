@@ -15,11 +15,34 @@ algunas especificaciones:
 1. el numero de prioridades puede crecer, es decir, no es estatico.
 2. cuando se refiere a (no utilizar la cola de prioridad) se refiere de que no se puede usar una clase de Queues, que generalmente es lo que se hace para hacer prioridades en C++.
 3. no se pueden usar vectores.
-
+4. no se puede usar las librerías maps y queues.
+5. SIEMPRE seguir FIFO y LIFO.
 posibles soluciones: 
 
-1. como no se tiene una clase para Queues, una solución alternativa seria crear una pila temporal, hacer las modificaciones necesarios procesando los datos, y después hacer que esa pila temporal sea la original, sin embargo, la pila siempre tiene que ser la misma, es decir, se puede crear la tempora y hacer modificaciones desde esa, pero la pila original siempre tiene que estar.
+1. como no se tiene una clase para Queues, una solución alternativa seria crear una pila temporal, hacer las modificaciones necesarios procesando los datos, y después hacer que esa pila temporal sea la original, sin embargo, la pila siempre tiene que ser la misma, es decir, se puede crear la temporal y hacer modificaciones desde esa, pero la pila original siempre tiene que estar.
 (tomando en cuenta lo anterior, se podría decir que es una lista enlanzada debido a no tener la clase de Queues).
+
+COSAS A ARREGLAR: 
+
+tarea 1:
+
+*nada
+
+tarea 2:
+
+*literalmente se esta tratando como una lista, saltándose la regla de que las colas tienen que cumplir con FIFO (First in, First Out) 
+
+tarea 3:
+
+*se tiene que replantear: es una lista que se trata como una cola, pero no es una cola como tal. Solo se ajusta el código de la lista enlazada simple para ordenar los nodos por un valor que identifica su prioridad.
+
+*cada nodo de la lista contienen una cola donde se estarán almacenado los datos que se quieren procesar.
+
+*un ejemplo: se supone que se tienen 3 prioridades A,B y C. entonces se crean 3 nodos que se ordenan por prioridades en la lista. Cuando se inserte un dato con prioridad A, este se insertara en la cola dentro del nodo asignado con prioridad A, lo mismo con las otras dos prioridades.
+
+*los datos se ordenan por prioridad, pero los datos se insertan en las colas internas de los nodos de la lista.
+
+*no se puede crear otra clase aparte de nodo y lista simple.
 
 TAMBIEN SE TIENE UN CODIGO DE EJEMPLO DE UNA CLASE DE LA UNIVERSIDAD CON CODIGO UTIL, ese es el siguiente:
 
@@ -151,10 +174,9 @@ class Queue{
         void print();
 };
 
-node:
+queueNode:
 
-node.cpp
-
+queueNode.cpp
 
 template <class T>
 void Node<T>::setNextNode(Node<T>* next){
@@ -174,8 +196,6 @@ T Node<T>::getData(){
    return this->data;
 }
 
-
-
 template<class T>
 void Node<T>::print(){
     cout<<this->data<<endl; //solo para datos simples
@@ -185,7 +205,7 @@ Node<T>::~Node(){
     next=NULL;
 }
 
-node.h
+queueNode.h
 
 template<class T>
 class Node{
@@ -200,6 +220,128 @@ class Node{
         T getData();
         void setNextNode(Node<T>*);
         void print();
+};
+
+treeNode:
+
+treeNode.cpp
+
+#include<iostream>
+#include "./node.h"
+using namespace std;
+
+template <class T>
+Node<T>::Node(T data, Node<T>* right, Node<T>* left){
+    this->data=data;
+    if(right!=NULL){
+        this->right=right;
+    }
+     if(left!=NULL){
+        this->left=left;
+    }
+}
+template <class T>
+Node<T>* Node<T>::getChildren(int child){
+    switch (child)
+    {
+    case 0:
+        return this->left;
+    case 1:
+        return this->right;
+    }
+    return NULL;
+}
+
+template <class T>
+void Node<T>::setChildren(Node<T>* right, Node<T>* left){
+    if(right != NULL && left!=NULL){
+        this->right=right;
+        this->left=left;
+    }else if(left!=NULL){
+    this->left=left;
+    }
+    else if(right != NULL){
+          this->right=right;
+    }else{
+        this->right=NULL;
+        this->left=NULL;
+    }
+}
+
+template <class T>
+void Node<T>::setData(T data){
+    this->data=data;
+}
+
+
+template <class T>
+T Node<T>::getData(){
+   return this->data;
+}
+
+
+template<class T>
+void Node<T>::print(){
+    cout<<this->data<<" "; //solo para datos simples
+}
+template <class T>
+Node<T>::~Node(){
+    this->right=NULL;
+    this->left=NULL;
+}
+
+template<class T>
+void Node<T>::setFe(){
+    if(this->right == NULL && this->left==NULL){
+        this->fe=0;
+    }
+    else if(this->right != NULL && this->left!=NULL){
+        this->fe=(this->right->higth)-(this->left->higth);
+    }else if(this->right == NULL ){
+        this->fe=-(this->left->higth);
+    }
+    else if( this->left==NULL){
+        this->fe=(this->right->higth);
+    }
+}
+
+template<class T>
+int Node<T>::getFe(){
+    return this->fe;  
+}
+
+template <class T>
+void Node<T>::setHeigth(int heigth){
+    this->higth=heigth;
+}
+
+template <class T>
+int Node<T>::getHeigth(){
+   return this->higth;
+}
+
+treeNode.h:
+
+template<class T>
+class Node{
+    private:
+        T data;
+        int higth = 0;
+        int fe=0;
+        Node<T> *left=NULL;
+        Node<T> *right=NULL;
+    public:
+        Node(T,Node<T>*,Node<T>*);
+        ~Node();
+        Node<T>* getChildren(int);
+        void setData(T);
+        T getData();
+        void setChildren(Node<T>*,Node<T>*);
+        void print();
+        void setFe();
+        int getFe();
+        void setHeigth(int);
+        int getHeigth();
 };
 
 Como se puede observar, el código esta separado en estructura MVC (modelo, vista, controlador) sin embargo, para esta tarea no es necesario, lo que si es necesario que se usen templates.
